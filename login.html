@@ -256,17 +256,16 @@
         // =========================================================
         // التحقق من الجلسة + توجيه المستخدم
         // =========================================================
-        async function resolveProfile(user) {
-            const { data, error } = await supabase
-                .from('staff_profiles')
-                .select('role, must_change_password, is_active, full_name')
-                .eq('user_id', user.id)
-                .maybeSingle();
+async function resolveProfile(user) {
+    const { data, error } = await supabase
+        .from('staff_profiles')
+        .select('role, must_change_password, is_active, full_name')
+        .eq('user_id', user.id) // <--- التأكد من استخدام user_id هنا
+        .maybeSingle();
 
-            if (error) throw error;
-            return data;
-        }
-
+    if (error) throw error;
+    return data;
+}
         function redirectByRole(role) {
             // ⚠️ جميع الأدوار تذهب للوحة التحكم حالياً
             return 'ragab_hassan_dashboard.html';
