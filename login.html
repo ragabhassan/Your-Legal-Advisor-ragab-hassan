@@ -148,9 +148,9 @@
         'use strict';
 
         // ⚠️ تم الاحتفاظ بالعنوان والمفتاح الأصليين
-              const SUPABASE_URL = 'https://yazykdnmmljoirnkeoyy.supabase.co';
-              const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhenlrZG5tbWxqb2lybmtlb3l5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0OTYxMzAsImV4cCI6MjEwNzA3MjEzMH0.3EPhGRr_oxMAWtqLP2dS6tBIgJbpkMOsSSSQeI3FqVs';
-              const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+              const _URL = 'https://yazykdnmmljoirnkeoyy..co';
+              const _ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhenlrZG5tbWxqb2lybmtlb3l5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0OTYxMzAsImV4cCI6MjEwNzA3MjEzMH0.3EPhGRr_oxMAWtqLP2dS6tBIgJbpkMOsSSSQeI3FqVs';
+              const  = window..createClient(_URL, _ANON_KEY);
 
         // =========================================================
         // عناصر DOM
@@ -210,7 +210,7 @@
             textSpan.textContent = originalText;
         }
 
-        // ترجمة أخطاء Supabase الشائعة
+        // ترجمة أخطاء  الشائعة
         function translateAuthError(message) {
             if (!message) return 'حدث خطأ غير معروف.';
             const msg = message.toLowerCase();
@@ -319,15 +319,34 @@
         }
 
         // فحص الجلسة عند فتح الصفحة
-        async function checkSession() {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session?.user) {
-                await routeUser(session.user);
-            } else {
-                showSection('login');
-            }
-        }
+      // 1. أضف هذا المتغير في أعلى ملف JavaScript (خارج أي دالة) لمنع التنفيذ المتكرر
+let isRouting = false;
 
+// 2. استبدل دالة checkSession بهذا الكود المعدل
+async function checkSession() {
+    // منع التنفيذ المتكرر إذا كانت العملية جارية بالفعل
+    if (isRouting) return; 
+    isRouting = true;
+
+    try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) throw error;
+
+        if (session?.user) {
+            await routeUser(session.user);
+        } else {
+            showSection('login');
+        }
+    } catch (e) {
+        console.error('خطأ أثناء فحص الجلسة:', e);
+        // في حال حدوث خطأ، نعرض صفحة تسجيل الدخول كإجراء احتياطي
+        showSection('login');
+        // ملاحظة: لا نعيد تعيين isRouting إلى false هنا لتجنب الدخول في حلقة مفرغة
+        // إذا كنت تريد السماح بإعادة المحاولة، يمكنك إعادة تعيينها بعد فترة زمنية
+        // setTimeout(() => { isRouting = false; }, 2000);
+    }
+}
         // =========================================================
         // تسجيل الدخول
         // =========================================================
